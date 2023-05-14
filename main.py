@@ -4,17 +4,29 @@ class Nodo:
         self.tipo = tipo
         self.extension = extension
         self.peso = peso
-        self.hijos = [None] * 4
+        self.hijo1 = None
+        self.hijo2 = None
+        self.hijo3 = None
+        self.hijo4 = None
 
     def agregar_hijo(self, hijo):
-        for i in range(4):
-            if not self.hijos[i]:
-                self.hijos[i] = hijo
-                return True
-        return False
+        if not self.hijo1:
+            self.hijo1 = hijo
+            return True
+        elif not self.hijo2:
+            self.hijo2 = hijo
+            return True
+        elif not self.hijo3:
+            self.hijo3 = hijo
+            return True
+        elif not self.hijo4:
+            self.hijo4 = hijo
+            return True
+        else:
+            return False
 
     def buscar_hijo(self, nombre):
-        for hijo in self.hijos:
+        for hijo in [self.hijo1, self.hijo2, self.hijo3, self.hijo4]:
             if hijo and hijo.nombre == nombre:
                 return hijo
         return None
@@ -30,10 +42,10 @@ class Nodo:
 
     def imprimir(self, nivel=0):
         if self.tipo == 'Carpeta':
-            print('  ' * nivel + f'📁 {self.nombre}')
+            print(' ' * nivel + f'📁 {self.nombre}')
         else:
-            print('  ' * nivel + f'{self.nombre}.{self.extension} ({self.peso} bytes)')
-        for hijo in self.hijos:
+            print(' ' * nivel + f'📄 {self.nombre}.{self.extension} ({self.peso} bytes)')
+        for hijo in [self.hijo1, self.hijo2, self.hijo3, self.hijo4]:
             if hijo:
                 hijo.imprimir(nivel + 1)
 
@@ -58,43 +70,56 @@ class Sistema:
         if not carpeta_madre:
             print(f'No se encontró la carpeta madre {carpeta_madre_nombre}')
             return
-        if any(hijo for hijo in carpeta_madre.hijos if hijo and hijo.nombre == archivo_nombre and hijo.extension == archivo_extension):
-            print(f'Ya existe un archivo con el nombre {archivo_nombre} y extensión {archivo_extension} en la carpeta madre {carpeta_madre_nombre}')
+        if any(hijo for hijo in [carpeta_madre.hijo1, carpeta_madre.hijo2,
+                                 carpeta_madre.hijo3, carpeta_madre.hijo4]
+               if hijo and hijo.nombre == archivo_nombre and hijo.extension == archivo_extension):
+            print(
+                f'Ya existe un archivo con el nombre {archivo_nombre} y extensión {archivo_extension} en la carpeta madre {carpeta_madre_nombre}')
             return
         if not carpeta_madre.agregar_hijo(Nodo(archivo_nombre, 'Archivo', archivo_extension, archivo_peso)):
             print(f'La carpeta madre {carpeta_madre_nombre} ya está llena')
 
-    def buscar_carpeta(self, nombre):
-        cola = [self.raiz]
-        while cola:
-            nodo_actual = cola.pop(0)
-            if nodo_actual.nombre == nombre and nodo_actual.tipo == 'Carpeta':
-                return nodo_actual
-            for hijo in nodo_actual.hijos:
-                if hijo:
-                    cola.append(hijo)
+
+    def buscar_carpeta(self, nombre, nodo_actual=None):
+        if not nodo_actual:
+            nodo_actual = self.raiz
+        if nodo_actual.nombre == nombre and nodo_actual.tipo == 'Carpeta':
+            return nodo_actual
+        for hijo in [nodo_actual.hijo1, nodo_actual.hijo2,
+                     nodo_actual.hijo3, nodo_actual.hijo4]:
+            if hijo:
+                resultado = self.buscar_carpeta(nombre, hijo)
+                if resultado:
+                    return resultado
         return None
 
-    def buscar_archivo(self, nombre):
-        cola = [self.raiz]
-        while cola:
-            nodo_actual = cola.pop(0)
-            if nodo_actual.nombre == nombre and nodo_actual.tipo == 'Archivo':
-                return nodo_actual
-            for hijo in nodo_actual.hijos:
-                if hijo:
-                    cola.append(hijo)
+
+    def buscar_archivo(self, nombre, nodo_actual=None):
+        if not nodo_actual:
+            nodo_actual = self.raiz
+        if nodo_actual.nombre == nombre and nodo_actual.tipo == 'Archivo':
+            return nodo_actual
+        for hijo in [nodo_actual.hijo1, nodo_actual.hijo2,
+                     nodo_actual.hijo3, nodo_actual.hijo4]:
+            if hijo:
+                resultado = self.buscar_archivo(nombre, hijo)
+                if resultado:
+                    return resultado
         return None
+
 
     def modificar_carpeta(self, carpeta_nombre_antiguo, carpeta_nombre_nuevo):
         carpeta = self.buscar_carpeta(carpeta_nombre_antiguo)
         if not carpeta:
             print(f'No se encontró la carpeta {carpeta_nombre_antiguo}')
             return
-        if any(hijo for hijo in carpeta.hijos if hijo and hijo.nombre == carpeta_nombre_nuevo):
+        if any(hijo for hijo in [carpeta.hijo1, carpeta.hijo2,
+                                 carpeta.hijo3, carpeta.hijo4]
+               if hijo and hijo.nombre == carpeta_nombre_nuevo):
             print(f'Ya existe una carpeta con el nombre {carpeta_nombre_nuevo} en el mismo nivel del árbol')
             return
         carpeta.modificar_nombre(carpeta_nombre_nuevo)
+
 
     def modificar_archivo(self, archivo_nombre_antiguo, archivo_nombre_nuevo=None,
                           archivo_extension_nueva=None, archivo_peso_nuevo=None):
@@ -108,6 +133,7 @@ class Sistema:
             archivo.modificar_extension(archivo_extension_nueva)
         if archivo_peso_nuevo:
             archivo.modificar_peso(archivo_peso_nuevo)
+
 
     def imprimir(self):
         self.raiz.imprimir()
