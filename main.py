@@ -437,3 +437,36 @@ def buscar_padre(self, nodo_buscado, nodo_actual=None):
             else:
                 self.eliminar_archivos_por_nombre(archivo_nombre, hijo)
 """
+
+
+"""def cambiar_extensiones(self, extension_antigua, extension_nueva, nodo_actual=None):
+    
+    if not nodo_actual:
+        nodo_actual = self.raiz
+
+    
+    if nodo_actual.tipo == 'Archivo' and nodo_actual.extension == extension_antigua:
+        nodo_actual.extension = extension_nueva
+
+    
+    for hijo in [nodo_actual.hijo1, nodo_actual.hijo2, nodo_actual.hijo3, nodo_actual.hijo4]:
+        if hijo:
+            self.cambiar_extensiones(extension_antigua, extension_nueva, hijo)
+"""
+
+
+
+"""def cambiar_nombres_carpetas(self, nombre_antiguo, nombre_nuevo, nodo_actual=None):
+    
+    if not nodo_actual:
+        nodo_actual = self.raiz
+
+    
+    if nodo_actual.tipo == 'Carpeta' and nodo_actual.nombre == nombre_antiguo:
+        nodo_actual.nombre = nombre_nuevo
+
+    
+    for hijo in [nodo_actual.hijo1, nodo_actual.hijo2, nodo_actual.hijo3, nodo_actual.hijo4]:
+        if hijo:
+            self.cambiar_nombres_carpetas(nombre_antiguo, nombre_nuevo, hijo)
+"""
